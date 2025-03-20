@@ -104,11 +104,12 @@
             const canvas = document.getElementById('imageCanvas');
             const ctx = canvas.getContext('2d');
             const image = new Image();
-            image.src = 'deurwaarder.png';
+            image.src = 'deurwaarder.png'; // Gebruik de geüploade afbeelding
 
             image.onload = () => {
                 updateCanvas();
             };
+
 
             function updateCanvas() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -169,9 +170,9 @@
                 ctx.fillStyle = '#3d464f';
                 ctx.font = '50px Arial';
                 ctx.textAlign = "center";
-                const textWidthPercentage = 0.8;
+                const textWidthPercentage = 0.78;
                 const maxWidth = canvas.width * textWidthPercentage;
-                drawTextWithLineBreaks(ctx, fullText, canvas.width / 2, canvas.height * 0.75, maxWidth);
+                drawTextWithLineBreaks(ctx, fullText, canvas.width / 2, 1300, maxWidth);
             }
 
             function drawTextWithLineBreaks(context, text, x, y, maxWidth) {
