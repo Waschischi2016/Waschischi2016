@@ -79,7 +79,7 @@
 </head>
 <body>
 
-    <h2>Beëdiging deurwaarder - Versie 1.1</h2>
+    <h1>Beëdiging deurwaarder - Demo</h1>
 
     <form id="demoForm">
         <label for="firstName">Voornaam:</label>
@@ -106,12 +106,23 @@
             const image = new Image();
             image.src = 'deurwaarder.png'; // Gebruik de geüploade afbeelding
 
+            // Debug variabelen
+            const isDebug = true; // Zet op true om te debuggen, false om te stoppen
+
+            function logMessage(message) {
+                if (isDebug) {
+                    console.log(message);
+                }
+            }
+
             image.onload = () => {
+                logMessage("Afbeelding geladen");
                 updateCanvas();
             };
 
 
             function updateCanvas() {
+                logMessage("updateCanvas aangeroepen");
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 
@@ -170,12 +181,13 @@
                 ctx.fillStyle = '#3d464f';
                 ctx.font = '50px Arial';
                 ctx.textAlign = "center";
-                const textWidthPercentage = 0.78;
+                const textWidthPercentage = 0.8;
                 const maxWidth = canvas.width * textWidthPercentage;
                 drawTextWithLineBreaks(ctx, fullText, canvas.width / 2, 1300, maxWidth);
             }
 
             function drawTextWithLineBreaks(context, text, x, y, maxWidth) {
+                logMessage("drawTextWithLineBreaks aangeroepen");
                 const words = text.split(" ");
                 let line = "";
                 const lineHeight = 50;
@@ -196,8 +208,60 @@
             }
 
             form.addEventListener('submit', function(event) {
+                logMessage("Form submit event handler aangeroepen");
                 event.preventDefault();
-                updateCanvas();
+
+                // Haal de canvas op
+                const canvas = document.getElementById('imageCanvas');
+
+                // Check of canvas gedefinieerd is
+                if (!canvas) {
+                    console.error('Canvas element niet gevonden.');
+                    document.getElementById('apiFeedback').innerHTML = 'Error: Canvas element niet gevonden.';
+                    return; // Stop de functie
+                }
+
+                // Probeer de dataURL op te halen en log deze
+                const dataURL = canvas.toDataURL('image/png');
+                logMessage('Data URL: ' + dataURL);
+
+
+                canvas.toBlob(function(blob) {
+                    //hier checken we de blob
+                    if(!blob){
+                        console.error('Blob is null or undefined');
+                        document.getElementById('apiFeedback').innerHTML = 'Error: Blob is null or undefined.';
+                        return;
+                    }
+                    const formData = new FormData();
+                    formData.append('file', blob, `Deurwaarderakte_${document.getElementById('firstName').value.trim()}_${document.getElementById('lastName').value.trim()}_${new Date().toLocaleDateString('nl-NL')}.png`);
+
+                    const apiKey = 'nT2E4QUBOqnmqZlEAybtEl0UcXQO89md';
+                    const url = 'https://api.fivemanage.com/api/image';
+
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${apiKey}`
+                        },
+                        body: formData
+                    })
+                    .then(response => {
+                        // Controleer de statuscode van het antwoord
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json(); // Probeer de response als JSON te parsen
+                    })
+                    .then(data => {
+                        logMessage('Succesvol geupload: ' + JSON.stringify(data));
+                        document.getElementById('apiFeedback').innerHTML = 'Afbeelding succesvol geüpload: <a href="' + data.url + '" target="_blank">Bekijk afbeelding</a>';
+                    })
+                    .catch(error => {
+                        console.error('Fout bij uploaden:', error);
+                        document.getElementById('apiFeedback').innerHTML = 'Fout bij uploaden van afbeelding: ' + error;
+                    });
+                }, 'image/png');
             });
         });
     </script>
