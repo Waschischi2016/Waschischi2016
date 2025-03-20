@@ -83,7 +83,7 @@
 </head>
 <body>
 
-<h1>Jachtakte uitgaven formulier 0.1</h1>
+<h1>Jachtakte uitgaven formulier 0.1.1</h1>
 <form id="overlayForm">
     <label for="firstName">Voornaam:</label>
     <input type="text" id="firstName" required>
@@ -192,7 +192,7 @@
         console.log('Blob created:', blob);
 
         // Append the image file to FormData
-        formData.append('file', blob, "Jagersakte: " +applicantName+'_'+ todayString + '.png');
+        formData.append('file', blob, "Jagersakte: " +firstname+'_'+lastname+'_'+ todayString + '.png');
         console.log('Form data prepared for upload');
 
         // Send the POST request with the image
