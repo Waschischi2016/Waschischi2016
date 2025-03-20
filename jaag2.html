@@ -83,74 +83,97 @@
 </head>
 <body>
 
-<h1>Jachtakte uitgaven formulier</h1>
+<h1>Jachtakte uitgaven formulier 0.1</h1>
 <form id="overlayForm">
-    <label for="applicantName">Uitgegeven aan:</label>
-    <input type="text" id="applicantName" required>
+    <label for="firstName">Voornaam:</label>
+    <input type="text" id="firstName" required>
 
-    <label for="judgeName">Rechter:</label>
-    <input type="text" id="judgeName" value="Felix Keizer" required>
+    <label for="lastName">Achternaam (inclusief voorvoegsels):</label>
+    <input type="text" id="lastName" required>
+
+    <label for="date">Datum (dd-mm-jjjj):</label>
+    <input type="text" id="date">
 
     <button type="submit">Maak Nieuwe Akte</button>
 </form>
 
-<canvas id="imageCanvas" width="1920" height="1080"></canvas>
+<canvas id="imageCanvas" width="1414" height="2000"></canvas>
 
 <script>
     const form = document.getElementById('overlayForm');
     const canvas = document.getElementById('imageCanvas');
     const ctx = canvas.getContext('2d');
     const image = new Image();
-    image.src = 'achtergrond.png'; // Replace with the path to your image
+    image.src = 'deurwaarder.png'; // Replace with the path to your image
 
     image.onload = () => {
         console.log('Image loaded successfully');
         ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
     };
 
-    form.addEventListener('submit', function(event) {
-        event.preventDefault();
-        console.log('Form submitted');
+        function updateCanvas() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-        const applicantName = document.getElementById('applicantName').value;
-        const judgeName = document.getElementById('judgeName').value || "Felix Keizer"; // Default to "Felix Keizer"
-        const today = new Date();
-        
-        // Extract the individual components from 'today'
-        const todayDay = String(today.getDate()).padStart(2, '0');
-        const todayMonth = String(today.getMonth() + 1).padStart(2, '0');
-        const todayYear = today.getFullYear();
+                const firstName = document.getElementById('firstName').value.trim();
+                const lastName = document.getElementById('lastName').value.trim();
+                let dateInput = document.getElementById('date').value.trim();
+                let today = new Date();
+                let todayString;
 
-        // Convert 'today' components to a string
-        const todayString = `${todayDay}  ${todayMonth}  ${todayYear}`;
+                if (dateInput === "") {
+                    todayString = today.toLocaleDateString('nl-NL', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                    });
+                } else {
+                    const dateParts = dateInput.split('-');
+                    if (dateParts.length === 3) {
+                        const day = parseInt(dateParts[0], 10);
+                        const month = parseInt(dateParts[1], 10) - 1;
+                        const year = parseInt(dateParts[2], 10);
+                        const providedDate = new Date(year, month, day);
 
-        // Calculate end date (28 days from today)
-        const endDate = new Date(today);
-        endDate.setDate(today.getDate() + 28);
+                        if (!isNaN(providedDate.getTime())) {
+                            todayString = providedDate.toLocaleDateString('nl-NL', {
+                                day: 'numeric',
+                                month: 'long',
+                                year: 'numeric'
+                            });
+                        } else {
+                            todayString = today.toLocaleDateString('nl-NL', {
+                                day: 'numeric',
+                                month: 'long',
+                                year: 'numeric'
+                            });
+                            alert("Ongeldige datum. Huidige datum gebruikt.");
+                        }
+                    } else {
+                        todayString = today.toLocaleDateString('nl-NL', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric'
+                        });
+                        alert("Ongeldige datumnotatie. Huidige datum gebruikt.");
+                    }
+                }
 
-        // Extract the individual components from 'endDate'
-        const endDay = String(endDate.getDate()).padStart(2, '0');
-        const endMonth = String(endDate.getMonth() + 1).padStart(2, '0');
-        const endYear = endDate.getFullYear();
+                const fullText = `Heeft met goed gevolg de opleiding tot deurwaarder met de daarbijbehorende wetskennis voldaan aan de\nUniversity of San Andreas, Los Santos behaald op ${todayString}.`;
 
-        // Convert 'endDate' components to a string
-        const endDateString = `${endDay}  ${endMonth}  ${endYear}`;
+                ctx.fillStyle = 'Black';
+                ctx.font = '150px Brush Script MT';
+                ctx.textAlign = "center";
+                ctx.fillText(firstName, canvas.width / 2, 1100);
+                ctx.fillText(lastName, canvas.width / 2, 1215);
 
-        ctx.drawImage(image, 0, 0, canvas.width, canvas.height); // Redraw the image
-        
-        // Set text properties
-        ctx.fillStyle = 'Black';
-        ctx.font = '40px Lucida Handwriting';
-        
-        ctx.fillText(applicantName, 1320 , 930);
-        ctx.font = 'italic 80px "Brush Script MT", cursive'; 
-        ctx.fillStyle= 'red';
-        ctx.fillText(judgeName, 750, 930);
-
-        ctx.fillStyle = '#3d464f';
-        ctx.font = '50px PT Serif';
-        ctx.fillText(` ${todayString}`, 1500, 285); 
-        ctx.fillText(` ${endDateString}`, 1500, 350);
+                ctx.fillStyle = '#3d464f';
+                ctx.font = '50px Arial';
+                ctx.textAlign = "center";
+                const textWidthPercentage = 0.78;
+                const maxWidth = canvas.width * textWidthPercentage;
+                drawTextWithLineBreaks(ctx, fullText, canvas.width / 2, 1300, maxWidth);
+            }
 
          // Convert canvas content to a PNG data URL
          const imageDataUrl = canvas.toDataURL('image/png');
