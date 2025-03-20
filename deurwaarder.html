@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beëdiging deurwaarder</title>
+    <title>Beëdiging deurwaarder - Demo</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -13,33 +13,33 @@
             margin: 0;
             padding: 0;
         }
-
         h1 {
             color: #333;
             font-size: 2.5em;
             margin-top: 20px;
             font-weight: bold;
-            font-family: 'Brush Script MT', cursive; /* Lettertype Brush Script MT */
+            font-family: 'Brush Script MT', cursive;
         }
-
-        #overlayForm {
+        #demoForm {
             background-color: #fff;
             padding: 20px;
             margin: 20px auto;
             width: 60%;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-
-        #overlayForm label {
+        #demoForm label {
             font-size: 1.1em;
             color: #555;
             margin-bottom: 8px;
             display: block;
             text-align: left;
+            width: 100%;
         }
-
-        #overlayForm input {
+        #demoForm input {
             width: 100%;
             padding: 12px;
             margin: 10px 0;
@@ -48,8 +48,7 @@
             font-size: 1em;
             box-sizing: border-box;
         }
-
-        #overlayForm button {
+        #demoForm button {
             padding: 12px 25px;
             background-color: #4CAF50;
             color: #fff;
@@ -58,153 +57,109 @@
             border-radius: 6px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            margin-top: 10px;
         }
-
-        #overlayForm button:hover {
+        #demoForm button:hover {
             background-color: #45a049;
         }
-
         canvas {
             border: 1px solid #ccc;
             margin-top: 30px;
             background-color: #fff;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 100%;
+            height: auto;
         }
-
-        .afgifteDatum {
-            font-family: cursive;
-            font-size: 50px;
-            color: #3d464f;
-            text-align: center;
-            margin: 0 auto;
-            word-wrap: break-word; /* Zorg ervoor dat de tekst niet buiten de container loopt */
-            overflow-wrap: break-word; /* Alternatieve methode om lange woorden af te breken */
-            word-break: break-word; /* Verbreekt lange woorden als ze te breed zijn voor de container */
-            white-space: normal; /* Zorgt ervoor dat de tekst op meerdere regels kan worden verdeeld */
-        }
-
-        .afgifteDatum-container {
-            text-align: center;
+        #apiFeedback {
             margin-top: 20px;
-            max-width: 80%; /* Maximale breedte van de tekstcontainer */
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        @media (max-width: 768px) {
-            #overlayForm {
-                width: 90%;
-            }
-
-            h1 {
-                font-size: 2em;
-            }
+            font-size: 1.1em;
+            color: #333;
         }
     </style>
 </head>
 <body>
 
-<h1>Beëdiging deurwaarder</h1>
-<form id="overlayForm">
-    <label for="firstName">Voornaam:</label>
-    <input type="text" id="firstName" required>
+    <h1>Beëdiging deurwaarder - Demo</h1>
 
-    <label for="lastName">Achternaam (inclusief voorvoegsels):</label>
-    <input type="text" id="lastName" required>
+    <form id="demoForm">
+        <label for="firstName">Voornaam:</label>
+        <input type="text" id="firstName" required>
 
-    <button type="submit">Maak Nieuwe Akte</button>
-</form>
+        <label for="lastName">Achternaam (inclusief voorvoegsels):</label>
+        <input type="text" id="lastName" required>
 
-<canvas id="imageCanvas" width="1414" height="2000"></canvas>
+        <button type="submit">Maak Nieuwe Akte</button>
+    </form>
 
-<!-- Dit is het deel waar de tekst ook op de pagina wordt weergegeven -->
-<div class="afgifteDatum-container">
-    <div id="afgifteDatumText" class="afgifteDatum">
-        <!-- De tekst wordt hier door de JavaScript toegevoegd -->
-    </div>
-</div>
+    <canvas id="imageCanvas" width="1414" height="2000"></canvas>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('overlayForm');
-        const canvas = document.getElementById('imageCanvas');
-        const ctx = canvas.getContext('2d');
-        const image = new Image();
-        image.src = 'deurwaarder.png';
+    <div id="apiFeedback"></div>
 
-        image.onload = () => {
-            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-        };
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('demoForm');
+            const canvas = document.getElementById('imageCanvas');
+            const ctx = canvas.getContext('2d');
+            const image = new Image();
+            image.src = 'deurwaarder.png';
 
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
+            image.onload = () => {
+                updateCanvas();
+            };
 
-            const firstName = document.getElementById('firstName').value.trim();
-            const lastName = document.getElementById('lastName').value.trim();
-            
-            const today = new Date();
-            const todayString = today.toLocaleDateString('nl-NL', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
-            });
+            function updateCanvas() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-            const fullText = `Heeft met goed gevolg de opleiding tot deurwaarder met de daarbijbehorende wetskennis voldaan aan de\nUniversity of San Andreas, Los Santos behaald op ${todayString}`;
-
-            // Zet de tekst in de div op de pagina
-            const textContainer = document.getElementById('afgifteDatumText');
-            textContainer.textContent = fullText;
-
-            // Pas de breedte aan voor de tekst in de div
-            const textWidth = 0.8 * window.innerWidth; // Pas dit percentage aan voor de gewenste breedte
-            textContainer.style.width = textWidth + 'px';
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-
-            ctx.fillStyle = 'Black';
-            ctx.font = '60px Brush Script MT'; 
-            ctx.textAlign = "center";
-            ctx.fillText(firstName, canvas.width / 2, 1000);
-            ctx.fillText(lastName, canvas.width / 2, 1100);
-
-            ctx.fillStyle = '#3d464f';
-            ctx.font = '50px Arial'; 
-            ctx.textAlign = "center";
-            ctx.fillText(fullText, canvas.width / 2, 1500);  // De tekst met de datum wordt hier weergegeven
-
-            canvas.toBlob(function(blob) {
-                const formData = new FormData();
-                formData.append('file', blob, `Deurwaarderakte_${firstName}_${lastName}_${todayString}.png`);
-
-                const apiKey = 'nT2E4QUBOqnmqZlEAybtEl0UcXQO89md';
-                const url = 'https://api.fivemanage.com/api/image';
-
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${apiKey}`
-                    },
-                    body: formData
-                })
-                .then(response => response.text())
-                .then(text => {
-                    console.log('Response van de server:', text);
-                    try {
-                        const data = JSON.parse(text);
-                        const imageUrl = data.url;
-                        alert('Afbeelding succesvol geüpload: ' + imageUrl);
-                    } catch (error) {
-                        alert('Fout bij het verwerken van de serverresponse: ' + text);
-                    }
-                })
-                .catch(error => {
-                    alert('Fout bij uploaden van afbeelding: ' + error);
+                const firstName = document.getElementById('firstName').value.trim();
+                const lastName = document.getElementById('lastName').value.trim();
+                const today = new Date();
+                const todayString = today.toLocaleDateString('nl-NL', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
                 });
-            }, 'image/png');
-        });
-    });
-</script>
+                const fullText = `Heeft met goed gevolg de opleiding tot deurwaarder met de daarbijbehorende wetskennis voldaan aan de\nUniversity of San Andreas, Los Santos behaald op ${todayString}.`;
 
+                ctx.fillStyle = 'Black';
+                ctx.font = '150px Brush Script MT';
+                ctx.textAlign = "center";
+                ctx.fillText(firstName, canvas.width / 2, 1100);
+                ctx.fillText(lastName, canvas.width / 2, 1215);
+
+                ctx.fillStyle = '#000000';
+                ctx.font = '40px Arial';
+                ctx.textAlign = "center";
+                const textWidthPercentage = 0.75;
+                const maxWidth = canvas.width * textWidthPercentage;
+                drawTextWithLineBreaks(ctx, fullText, canvas.width / 2, 1320, maxWidth);
+            }
+
+            function drawTextWithLineBreaks(context, text, x, y, maxWidth) {
+                const words = text.split(" ");
+                let line = "";
+                const lineHeight = 50;
+
+                for (let n = 0; n < words.length; n++) {
+                    const testLine = line + words[n] + " ";
+                    const metrics = context.measureText(testLine);
+                    const testWidth = metrics.width;
+                    if (testWidth > maxWidth && n > 0) {
+                        context.fillText(line, x, y);
+                        line = words[n] + " ";
+                        y += lineHeight;
+                    } else {
+                        line = testLine;
+                    }
+                }
+                context.fillText(line, x, y);
+            }
+
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                updateCanvas();
+            });
+        });
+    </script>
 </body>
 </html>
