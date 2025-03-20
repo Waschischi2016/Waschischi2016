@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Overlay Form</title>
+    <title>Beëdiging deurwaarder</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -19,6 +19,7 @@
             font-size: 2.5em;
             margin-top: 20px;
             font-weight: bold;
+            font-family: 'Brush Script MT', cursive; /* Lettertype Brush Script MT */
         }
 
         #overlayForm {
@@ -70,6 +71,26 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
+        .afgifteDatum {
+            font-family: cursive;
+            font-size: 50px;
+            color: #3d464f;
+            text-align: center;
+            margin: 0 auto;
+            word-wrap: break-word; /* Zorg ervoor dat de tekst niet buiten de container loopt */
+            overflow-wrap: break-word; /* Alternatieve methode om lange woorden af te breken */
+            word-break: break-word; /* Verbreekt lange woorden als ze te breed zijn voor de container */
+            white-space: normal; /* Zorgt ervoor dat de tekst op meerdere regels kan worden verdeeld */
+        }
+
+        .afgifteDatum-container {
+            text-align: center;
+            margin-top: 20px;
+            max-width: 80%; /* Maximale breedte van de tekstcontainer */
+            margin-left: auto;
+            margin-right: auto;
+        }
+
         @media (max-width: 768px) {
             #overlayForm {
                 width: 90%;
@@ -83,121 +104,107 @@
 </head>
 <body>
 
-<h1>Jachtakte uitgaven form</h1>
+<h1>Beëdiging deurwaarder</h1>
 <form id="overlayForm">
-    <label for="applicantName">Uitgegeven aan:</label>
-    <input type="text" id="applicantName" required>
+    <label for="firstName">Voornaam:</label>
+    <input type="text" id="firstName" required>
 
-    <label for="judgeName">Rechter:</label>
-    <input type="text" id="judgeName" value="Felix Keizer" required>
+    <label for="lastName">Achternaam (inclusief voorvoegsels):</label>
+    <input type="text" id="lastName" required>
 
     <button type="submit">Maak Nieuwe Akte</button>
 </form>
 
-<canvas id="imageCanvas" width="1920" height="1080"></canvas>
+<canvas id="imageCanvas" width="1414" height="2000"></canvas>
+
+<!-- Dit is het deel waar de tekst ook op de pagina wordt weergegeven -->
+<div class="afgifteDatum-container">
+    <div id="afgifteDatumText" class="afgifteDatum">
+        <!-- De tekst wordt hier door de JavaScript toegevoegd -->
+    </div>
+</div>
 
 <script>
-    const form = document.getElementById('overlayForm');
-    const canvas = document.getElementById('imageCanvas');
-    const ctx = canvas.getContext('2d');
-    const image = new Image();
-    image.src = 'achtergrond.png'; // Replace with the path to your image
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('overlayForm');
+        const canvas = document.getElementById('imageCanvas');
+        const ctx = canvas.getContext('2d');
+        const image = new Image();
+        image.src = 'deurwaarder.png';
 
-    image.onload = () => {
-        console.log('Image loaded successfully');
-        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-    };
+        image.onload = () => {
+            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        };
 
-    form.addEventListener('submit', function(event) {
-        event.preventDefault();
-        console.log('Form submitted');
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
 
-        const applicantName = document.getElementById('applicantName').value;
-        const judgeName = document.getElementById('judgeName').value || "Felix Keizer"; // Default to "Felix Keizer"
-        const today = new Date();
-        
-        // Extract the individual components from 'today'
-        const todayDay = String(today.getDate()).padStart(2, '0');
-        const todayMonth = String(today.getMonth() + 1).padStart(2, '0');
-        const todayYear = today.getFullYear();
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            
+            const today = new Date();
+            const todayString = today.toLocaleDateString('nl-NL', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
 
-        // Convert 'today' components to a string
-        const todayString = `${todayDay}  ${todayMonth}  ${todayYear}`;
+            const fullText = `Heeft met goed gevolg de opleiding tot deurwaarder met de daarbijbehorende wetskennis voldaan aan de\nUniversity of San Andreas, Los Santos behaald op ${todayString}`;
 
-        // Calculate end date (28 days from today)
-        const endDate = new Date(today);
-        endDate.setDate(today.getDate() + 28);
+            // Zet de tekst in de div op de pagina
+            const textContainer = document.getElementById('afgifteDatumText');
+            textContainer.textContent = fullText;
 
-        // Extract the individual components from 'endDate'
-        const endDay = String(endDate.getDate()).padStart(2, '0');
-        const endMonth = String(endDate.getMonth() + 1).padStart(2, '0');
-        const endYear = endDate.getFullYear();
+            // Pas de breedte aan voor de tekst in de div
+            const textWidth = 0.8 * window.innerWidth; // Pas dit percentage aan voor de gewenste breedte
+            textContainer.style.width = textWidth + 'px';
 
-        // Convert 'endDate' components to a string
-        const endDateString = `${endDay}  ${endMonth}  ${endYear}`;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-        ctx.drawImage(image, 0, 0, canvas.width, canvas.height); // Redraw the image
-        
-        // Set text properties
-        ctx.fillStyle = 'Black';
-        ctx.font = '40px Lucida Handwriting';
-        
-        ctx.fillText(applicantName, 1320 , 930);
-        ctx.font = 'italic 80px "Brush Script MT", cursive'; 
-        ctx.fillStyle= 'red';
-        ctx.fillText(judgeName, 750, 930);
+            ctx.fillStyle = 'Black';
+            ctx.font = '60px Brush Script MT'; 
+            ctx.textAlign = "center";
+            ctx.fillText(firstName, canvas.width / 2, 1000);
+            ctx.fillText(lastName, canvas.width / 2, 1100);
 
-        ctx.fillStyle = '#3d464f';
-        ctx.font = '50px PT Serif';
-        ctx.fillText(` ${todayString}`, 1500, 285); 
-        ctx.fillText(` ${endDateString}`, 1500, 350);
+            ctx.fillStyle = '#3d464f';
+            ctx.font = '50px Arial'; 
+            ctx.textAlign = "center";
+            ctx.fillText(fullText, canvas.width / 2, 1500);  // De tekst met de datum wordt hier weergegeven
 
-         // Convert canvas content to a PNG data URL
-         const imageDataUrl = canvas.toDataURL('image/png');
-        console.log('Canvas to image data URL created:', imageDataUrl);
+            canvas.toBlob(function(blob) {
+                const formData = new FormData();
+                formData.append('file', blob, `Deurwaarderakte_${firstName}_${lastName}_${todayString}.png`);
 
-        // Create a new FormData object to send the image via POST request
-        const formData = new FormData();
-        
-        // Convert the data URL to a Blob (binary data) for file upload
-        const byteArray = atob(imageDataUrl.split(',')[1]); // Decode base64
-        const uintArray = new Uint8Array(byteArray.length);
-        for (let i = 0; i < byteArray.length; i++) {
-            uintArray[i] = byteArray.charCodeAt(i);
-        }
-        const blob = new Blob([uintArray], { type: 'image/png' });
-        console.log('Blob created:', blob);
+                const apiKey = 'nT2E4QUBOqnmqZlEAybtEl0UcXQO89md';
+                const url = 'https://api.fivemanage.com/api/image';
 
-        // Append the image file to FormData
-        formData.append('file', blob, "Jagersakte: " +applicantName+'_'+ todayString + '.png');
-        console.log('Form data prepared for upload');
-
-        // Send the POST request with the image
-        const apiKey = 'g689YjeWwGiCFyzKwPHNww7MYxiGUeAv';
-        const url = 'https://api.fivemanage.com/api/image';
-
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Authorization': apiKey,
-            },
-            body: formData
-        })
-        .then(response => {
-            console.log('Response received:', response);
-            return response.json();
-        })
-        .then(data => {
-            console.log('Image uploaded successfully:', data);
-        const imageUrl = data.url; // Assuming the URL is returned in the 'url' field of the response
-        
-        alert('' + imageUrl); // Display the URL in an alert (or use it however you need)
-        })
-        .catch(error => {
-            console.error('Error uploading image:', error);
-            alert('Failed to upload image');
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(text => {
+                    console.log('Response van de server:', text);
+                    try {
+                        const data = JSON.parse(text);
+                        const imageUrl = data.url;
+                        alert('Afbeelding succesvol geüpload: ' + imageUrl);
+                    } catch (error) {
+                        alert('Fout bij het verwerken van de serverresponse: ' + text);
+                    }
+                })
+                .catch(error => {
+                    alert('Fout bij uploaden van afbeelding: ' + error);
+                });
+            }, 'image/png');
         });
     });
 </script>
+
 </body>
 </html>
