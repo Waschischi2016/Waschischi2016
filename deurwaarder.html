@@ -88,6 +88,9 @@
         <label for="lastName">Achternaam (inclusief voorvoegsels):</label>
         <input type="text" id="lastName" required>
 
+        <label for="date">Datum (dd-mm-jjjj):</label>
+        <input type="text" id="date">
+
         <button type="submit">Maak Nieuwe Akte</button>
     </form>
 
@@ -113,12 +116,48 @@
 
                 const firstName = document.getElementById('firstName').value.trim();
                 const lastName = document.getElementById('lastName').value.trim();
-                const today = new Date();
-                const todayString = today.toLocaleDateString('nl-NL', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric'
-                });
+                let dateInput = document.getElementById('date').value.trim();
+                let today = new Date();
+                let todayString;
+
+                if (dateInput === "") {
+                    todayString = today.toLocaleDateString('nl-NL', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                    });
+                } else {
+                    const dateParts = dateInput.split('-');
+                    if (dateParts.length === 3) {
+                        const day = parseInt(dateParts[0], 10);
+                        const month = parseInt(dateParts[1], 10) - 1;
+                        const year = parseInt(dateParts[2], 10);
+                        const providedDate = new Date(year, month, day);
+
+                        if (!isNaN(providedDate.getTime())) {
+                            todayString = providedDate.toLocaleDateString('nl-NL', {
+                                day: 'numeric',
+                                month: 'long',
+                                year: 'numeric'
+                            });
+                        } else {
+                            todayString = today.toLocaleDateString('nl-NL', {
+                                day: 'numeric',
+                                month: 'long',
+                                year: 'numeric'
+                            });
+                            alert("Ongeldige datum. Huidige datum gebruikt.");
+                        }
+                    } else {
+                        todayString = today.toLocaleDateString('nl-NL', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric'
+                        });
+                        alert("Ongeldige datumnotatie. Huidige datum gebruikt.");
+                    }
+                }
+
                 const fullText = `Heeft met goed gevolg de opleiding tot deurwaarder met de daarbijbehorende wetskennis voldaan aan de\nUniversity of San Andreas, Los Santos behaald op ${todayString}.`;
 
                 ctx.fillStyle = 'Black';
@@ -127,12 +166,12 @@
                 ctx.fillText(firstName, canvas.width / 2, 1100);
                 ctx.fillText(lastName, canvas.width / 2, 1215);
 
-                ctx.fillStyle = '#000000';
-                ctx.font = '40px Arial';
+                ctx.fillStyle = '#3d464f';
+                ctx.font = '50px Arial';
                 ctx.textAlign = "center";
-                const textWidthPercentage = 0.75;
+                const textWidthPercentage = 0.8;
                 const maxWidth = canvas.width * textWidthPercentage;
-                drawTextWithLineBreaks(ctx, fullText, canvas.width / 2, 1320, maxWidth);
+                drawTextWithLineBreaks(ctx, fullText, canvas.width / 2, canvas.height * 0.75, maxWidth);
             }
 
             function drawTextWithLineBreaks(context, text, x, y, maxWidth) {
