@@ -1,7 +1,61 @@
 <!DOCTYPE html>
-<html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3x2 Grid Knoppen</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            height: 100vh;
+            width: calc(100vw - 40px);
+            gap: 10px;
+            background: linear-gradient(180deg, #d1d1d1, #d1d1d1);
+            padding: 5%;
+        }
+        .button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(180deg, #d1d1d1, #5f5f5f);
+        }
+        .button img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+    </style>
+    <script>
+        function checkPassword(url, correctPassword) {
+            var password = prompt("Voer het wachtwoord in:");
+            if (password === correctPassword) {
+                window.location.href = url;
+            } else {
+                alert("Onjuist wachtwoord. Probeer het opnieuw.");
+            }
+        }
+    </script>
+</head>
 <body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.</p>
+    <div class="button" onclick="checkPassword('Weedworld.html', 'W&&DW0RID1!')"><img src="weedworld.png" alt="Knop 1"></div>
+    <div class="button" onclick="checkPassword('Weazel.html', 'WE@ZEL')"><img src="WeazelNews.webp" alt="Knop 5"></div>
+    <div class="button" onclick="checkPassword('jaag.html', 'jager')" style="background-color: #0f1511 ;" ><img src="Jager.png" alt="Knop 5"></div>
 </body>
 </html>
