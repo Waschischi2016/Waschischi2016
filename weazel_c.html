@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Overlay Form</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        #overlayForm {
+            background-color: #fff;
+            padding: 20px;
+            margin: 20px auto;
+            width: 60%;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        #overlayForm label {
+            font-size: 1.1em;
+            color: #555;
+            margin-bottom: 8px;
+            display: block;
+            text-align: left;
+        }
+
+        #overlayForm input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+
+        #overlayForm button {
+            padding: 12px 25px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            font-size: 1.2em;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #overlayForm button:hover {
+            background-color: #45a049;
+        }
+
+        canvas {
+            border: 1px solid #ccc;
+            margin-top: 30px;
+            background-color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            #overlayForm {
+                width: 90%;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<h1>Aanstellingsbrief Weazelnews</h1>
+<h4>versie 23 maart 08:53</h4>
+<form id="overlayForm">
+    <label for="voornaam">Voornaam:</label>
+    <input type="text" id="voornaam" value="Pabloïnca" required>
+
+    <label for="achternaam">Achternaam inclusief voorvoegsels:</label>
+    <input type="text" id="achternaam" value="Bannanahammock" required>
+
+    <label for="functie">Beoogde functie:</label>
+    <input type="text" id="functie" value="Reporter" required>
+
+    <label for="Startdatum">Startdatum (Leeg = vandaag):</label>
+    <input type="text" id="StartDatum" value="22-03-2025">
+
+    <label for="Einddatum">Einddatum (Leeg = vast contract)</label>
+    <input type="text" id="EindDatum" value="04-04-2025">
+
+    <button type="submit">Maak akte</button>
+</form>
+
+<canvas id="imageCanvas" width="1414" height="2000"></canvas>
+
+<script>
+    const form = document.getElementById('overlayForm');
+    const canvas = document.getElementById('imageCanvas');
+    const ctx = canvas.getContext('2d');
+    const image = new Image();
+    image.src = 'weazelnewscontract_blanco.png'; // Replace with the path to your image
+
+    let today = new Date();
+    let todayString;
+    let isDebug = true;
+
+    image.onload = () => {
+        console.log('Image loaded successfully');
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    };
+
+    todayString = today.toLocaleDateString('nl-NL', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                    });
+                    console.log(todayString)
+
+            function logMessage(message) {
+                if (isDebug) {
+                    console.log(message);
+                }
+            }
+            
+            
+            function drawTextWithLineBreaks(context, text, x, y, maxWidth) {
+                logMessage("drawTextWithLineBreaks aangeroepen");
+                const words = text.split(" ");
+                let line = "";
+                const lineHeight = 50;
+
+                for (let n = 0; n < words.length; n++) {
+                    const testLine = line + words[n] + " ";
+                    const metrics = context.measureText(testLine);
+                    const testWidth = metrics.width;
+                    if (testWidth > maxWidth && n > 0) {
+                        context.fillText(line, x, y);
+                        line = words[n] + " ";
+                        y += lineHeight;
+                    } else {
+                        line = testLine;
+                    }
+                }
+                context.fillText(line, x, y);
+            }
+
+                    
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        console.log('Form submitted');
+
+        const voornaam = document.getElementById('voornaam').value;
+        const achternaam = document.getElementById('achternaam').value;
+        const today = new Date();
+        
+        // Extract the individual components from 'today'
+        const todayDay = String(today.getDate()).padStart(2, '0');
+        const todayMonth = String(today.getMonth() + 1).padStart(2, '0');
+        const todayYear = today.getFullYear();
+        const functie = document.getElementById('functie').value;
+
+
+        const volledigeNaam = voornaam+` `+achternaam
+        const fullText1 = ` ${todayString}`;
+        const fullText2 = `De werknemer zal in dienst treden als ${functie} met de volgende verantwoordelijkheden en taken:`;
+        const fullText3 = `Deze aanstelling treedt in werking op ${todayString} en is geldig tot nader order en is door beide partijen`;
+        // Convert 'today' components to a string
+        // const todayString = `${todayDay}  ${todayMonth}  ${todayYear}`;
+
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height); // Redraw the image
+        
+        // Set text properties
+        ctx.fillStyle = 'Red';
+        ctx.font = 'Bold 30px Arial';
+        ctx.textAlign = "Left";
+        ctx.fillText('Datum:', 75, 400);
+        ctx.fillText('Adres:', 75, 430);
+        ctx.fillText('Naam medewerker:', 75, 460);
+        ctx.fillText('Functie:', 75, 490);
+        ctx.fillText('Artikel 1: ', 75, 530);
+        ctx.fillText('Artikel 2: ', 75, 675);
+        ctx.fillText('Artikel 3: ', 75, 770);
+        
+        ctx.font = '30px Arial';
+        ctx.fillText(fullText1, 175, 400);
+        ctx.fillText('Dorset Drive 893, Los Santos', 174, 430);
+        ctx.fillText(volledigeNaam, 355, 460);
+        ctx.fillText(functie, 196, 490);
+        ctx.fillText('Functie en werkzaamheden', 206, 530);
+        ctx.fillText('Duur van de aanstelling', 206, 675);
+        ctx.fillText('Verloning', 206, 770);
+
+
+        ctx.font = '25px Arial';
+        ctx.fillText(fullText2, 75, 560);
+        ctx.fillText('- Schrijven van nieuwsartikelen en rapportages', 85, 585)
+        ctx.fillText('- Verzamelen en onderzoeken van nieuwswaardige rapporages', 85, 610)
+        ctx.fillText('- Andere taken zoals overeengekomen met leidinggevende(n)', 85, 635)
+        ctx.fillText(fullText3, 75, 705)
+        ctx.fillText('direct op te zeggen.', 75, 730)
+        ctx.fillText('De werknemer ontvangt een salaris van 450 euro per periode.', 75, 800)
+        
+
+        ctx.fillText(voornaam, canvas.width / 2 , 1100);
+        ctx.fillText(achternaam, canvas.width / 2, 1215);
+
+ 
+        ctx.fillStyle = '#3d464f';
+                ctx.font = '45px Arial';
+                ctx.textAlign = "center";
+                const textWidthPercentage = 0.75;
+                const maxWidth = canvas.width * textWidthPercentage;
+        //        drawTextWithLineBreaks(ctx, fullText, canvas.width / 2, 1350, maxWidth);
+
+
+    
+
+         // Convert canvas content to a PNG data URL
+         const imageDataUrl = canvas.toDataURL('image/png');
+        console.log('Canvas to image data URL created:', imageDataUrl);
+
+        // Create a new FormData object to send the image via POST request
+        const formData = new FormData();
+        
+        // Convert the data URL to a Blob (binary data) for file upload
+        const byteArray = atob(imageDataUrl.split(',')[1]); // Decode base64
+        const uintArray = new Uint8Array(byteArray.length);
+        for (let i = 0; i < byteArray.length; i++) {
+            uintArray[i] = byteArray.charCodeAt(i);
+        }
+        const blob = new Blob([uintArray], { type: 'image/png' });
+        console.log('Blob created:', blob);
+
+        // Append the image file to FormData
+        formData.append('file', blob, "Jagersakte: " +voornaam+'_'+ todayString + '.png');
+        console.log('Form data prepared for upload');
+
+        // Send the POST request with the image
+        const apiKey = 'RXvMKUIC10Rx5zUGmRGZnUIkab2vVMno';
+        const url = 'https://api.fivemanage.com/api/image';
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': apiKey,
+            },
+            body: formData
+        })
+        .then(response => {
+            console.log('Response received:', response);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Image uploaded successfully:', data);
+        const imageUrl = data.url; // Assuming the URL is returned in the 'url' field of the response
+        
+        alert('' + imageUrl); // Display the URL in an alert (or use it however you need)
+        })
+        .catch(error => {
+            console.error('Error uploading image:', error);
+            alert('Failed to upload image');
+        });
+    });
+</script>
+</body>
+</html>
